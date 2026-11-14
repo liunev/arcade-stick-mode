@@ -14,13 +14,16 @@ DIST_ZIP       := $(DIST_DIR)/Arcade-Stick-Mode-$(VERSION).zip
 SIGN_ID        ?= Developer ID Application
 NOTARY_PROFILE ?= arcade-stick-mode
 
-.PHONY: build install uninstall quit clean dist-app release
+ICONSET        := $(BUILD_DIR)/AppIcon.iconset
+
+.PHONY: build install uninstall quit clean dist-app release icon
 
 # Compile the app and assemble the .app bundle in ./build
 build:
-	mkdir -p "$(APP)/Contents/MacOS"
+	mkdir -p "$(APP)/Contents/MacOS" "$(APP)/Contents/Resources"
 	swiftc -O ArcadeStickMode.swift -o "$(APP)/Contents/MacOS/ArcadeStickMode"
 	cp Info.plist "$(APP)/Contents/Info.plist"
+	cp Resources/AppIcon.icns "$(APP)/Contents/Resources/AppIcon.icns"
 	codesign --force --sign - "$(APP)"
 	@echo "Built $(APP)"
 
@@ -50,12 +53,13 @@ clean:
 # Universal (Apple Silicon + Intel) app signed with the hardened runtime
 dist-app:
 	rm -rf "$(DIST_DIR)"
-	mkdir -p "$(DIST_APP)/Contents/MacOS"
+	mkdir -p "$(DIST_APP)/Contents/MacOS" "$(DIST_APP)/Contents/Resources"
 	swiftc -O -target arm64-apple-macos$(MIN_MACOS) ArcadeStickMode.swift -o "$(DIST_DIR)/arm64"
 	swiftc -O -target x86_64-apple-macos$(MIN_MACOS) ArcadeStickMode.swift -o "$(DIST_DIR)/x86_64"
 	lipo -create "$(DIST_DIR)/arm64" "$(DIST_DIR)/x86_64" -output "$(DIST_APP)/Contents/MacOS/ArcadeStickMode"
 	rm "$(DIST_DIR)/arm64" "$(DIST_DIR)/x86_64"
 	cp Info.plist "$(DIST_APP)/Contents/Info.plist"
+	cp Resources/AppIcon.icns "$(DIST_APP)/Contents/Resources/AppIcon.icns"
 	codesign --force --options runtime --timestamp --sign "$(SIGN_ID)" "$(DIST_APP)"
 	codesign --verify --strict "$(DIST_APP)"
 
@@ -70,3 +74,15 @@ release: dist-app
 	ditto -c -k --keepParent "$(DIST_APP)" "$(DIST_ZIP)"
 	spctl --assess --type execute --verbose "$(DIST_APP)"
 	@echo "Release archive: $(DIST_ZIP)"
+
+# Redraw the icon from Resources/make-icon.swift and rebuild AppIcon.icns
+icon:
+	swift Resources/make-icon.swift Resources/AppIcon.png
+	mkdir -p "$(ICONSET)"
+	for s in 16 32 128 256 512; do \
+		sips -z $$s $$s Resources/AppIcon.png --out "$(ICONSET)/icon_$${s}x$${s}.png" >/dev/null; \
+		d=$$((s * 2)); \
+		sips -z $$d $$d Resources/AppIcon.png --out "$(ICONSET)/icon_$${s}x$${s}@2x.png" >/dev/null; \
+	done
+	iconutil -c icns "$(ICONSET)" -o Resources/AppIcon.icns
+	@echo "Wrote Resources/AppIcon.icns"
