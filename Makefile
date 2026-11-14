@@ -6,11 +6,11 @@ INSTALL_DIR ?= $(HOME)/Applications
 INSTALLED   := $(INSTALL_DIR)/$(APP_NAME).app
 
 # Release build (maintainers): universal, Developer ID signed, notarized
-VERSION        := $(shell /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Info.plist)
 MIN_MACOS      := 13.0
 DIST_DIR       := dist
 DIST_APP       := $(DIST_DIR)/$(APP_NAME).app
-DIST_ZIP       := $(DIST_DIR)/Arcade-Stick-Mode-$(VERSION).zip
+# The README's download link points at this exact file name on the latest release
+DIST_ZIP       := $(DIST_DIR)/Arcade-Stick-Mode.zip
 SIGN_ID        ?= Developer ID Application
 NOTARY_PROFILE ?= arcade-stick-mode
 

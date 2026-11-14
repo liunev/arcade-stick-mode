@@ -1,6 +1,12 @@
 # Arcade Stick Mode
 
-<img src="Resources/AppIcon.png" width="128" alt="Arcade Stick Mode icon: a toggle switch whose knob is a red arcade button">
+<p align="center">
+  <a href="https://github.com/liunev/arcade-stick-mode/releases/latest/download/Arcade-Stick-Mode.zip">
+    <img src="Resources/AppIcon.png" width="160" alt="Download Arcade Stick Mode"><br>
+    <strong>Download for macOS</strong>
+  </a><br>
+  <sub>Unzip, move to Applications, open. macOS 13 or later, Apple Silicon and Intel.</sub>
+</p>
 
 A macOS menu bar app that makes an **8BitDo Arcade Controller** work in **Fightcade**, and lets you switch it back for Steam and everything else.
 
@@ -37,7 +43,7 @@ It re-applies the right mode whenever the stick reconnects, and quitting the app
 
 ### Download the app
 
-1. Download the `Arcade-Stick-Mode` zip from the [latest release](https://github.com/liunev/arcade-stick-mode/releases/latest).
+1. Download [Arcade-Stick-Mode.zip](https://github.com/liunev/arcade-stick-mode/releases/latest/download/Arcade-Stick-Mode.zip), the latest release.
 2. Unzip it and move **Arcade Stick Mode** to your Applications folder.
 3. Open it. A game controller icon appears in the menu bar.
 
@@ -113,7 +119,7 @@ The whole app is one Swift file: [ArcadeStickMode.swift](ArcadeStickMode.swift).
 
 ## Making a release
 
-For maintainers. `make release` builds a universal app, signs it with a Developer ID Application certificate, notarizes it, staples the ticket and writes the zip to `dist/`. It expects the certificate in the keychain and notarization credentials saved once under the profile name `arcade-stick-mode`:
+For maintainers. `make release` builds a universal app, signs it with a Developer ID Application certificate, notarizes it, staples the ticket and writes `dist/Arcade-Stick-Mode.zip`. Attach the zip to the GitHub release under that exact name, because the download link at the top of this README points at it. `make release` expects the certificate in the keychain and notarization credentials saved once under the profile name `arcade-stick-mode`:
 
 ```bash
 xcrun notarytool store-credentials arcade-stick-mode
