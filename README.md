@@ -28,15 +28,22 @@ It re-applies the right mode whenever the stick reconnects, and quitting the app
 
 ## Requirements
 
-- macOS 13 or later
+- macOS 13 or later, Apple Silicon or Intel
 - The stick connected over **Bluetooth** in **Switch mode** (it shows up in Bluetooth settings as "Arcade Controller")
-- Xcode Command Line Tools, to build the app:
-
-  ```bash
-  xcode-select --install
-  ```
 
 ## Install
+
+### Download the app
+
+1. Download `Arcade-Stick-Mode-1.0.zip` from the [latest release](https://github.com/liunev/arcade-stick-mode/releases/latest).
+2. Unzip it and move **Arcade Stick Mode** to your Applications folder.
+3. Open it. A game controller icon appears in the menu bar.
+
+The app is signed with a Developer ID and notarized by Apple, so it opens without a Gatekeeper warning beyond the usual "downloaded from the internet" confirmation.
+
+### Or build it from source
+
+This needs the Xcode Command Line Tools (`xcode-select --install`).
 
 ```bash
 git clone https://github.com/liunev/arcade-stick-mode.git
@@ -50,9 +57,11 @@ cd arcade-stick-mode
 make install
 ```
 
-This builds the app, copies it to `~/Applications/Arcade Stick Mode.app` and starts it. The app is built on your own Mac, so there is no Gatekeeper warning to get past.
+This builds the app, copies it to `~/Applications/Arcade Stick Mode.app` and starts it.
 
-To start it automatically when you log in, add it under **System Settings → General → Login Items**.
+### Start it at login
+
+Add the app under **System Settings → General → Login Items**.
 
 ## Use it with Fightcade
 
@@ -74,19 +83,15 @@ A classic six-button layout for Street Fighter style games:
 
 ## Uninstall
 
-From the cloned folder:
-
-```bash
-make uninstall
-```
-
-Or quit the app from its menu and delete `~/Applications/Arcade Stick Mode.app`.
+Quit the app from its menu and delete **Arcade Stick Mode** from your Applications folder. If you built it from source, `make uninstall` in the cloned folder does the same.
 
 ## What it has been tested with
 
 - 8BitDo Arcade Controller, Switch mode, Bluetooth
 - macOS 26.5 on Apple Silicon
 - Fightcade 2 with its FBNeo emulator (bundled Wine 5.0)
+
+The Intel half of the release build has only been run under Rosetta, not on an Intel Mac.
 
 The app acts on any Bluetooth controller that identifies as a Switch Pro Controller, so it may also help with a real Pro Controller or other 8BitDo controllers in Switch mode. Those are untested.
 
@@ -103,6 +108,14 @@ Over Bluetooth, a Switch Pro Controller's HID descriptor describes its buttons, 
 The app opens the controller with `IOHIDManager` and sends the Switch "set input report mode" subcommand (`0x03`) in output report `0x01`, with argument `0x3F` for standard HID reports or `0x30` to restore the macOS default. It then watches the incoming report type and sends the command again if macOS or a reconnect changes it back.
 
 The whole app is one Swift file: [ArcadeStickMode.swift](ArcadeStickMode.swift).
+
+## Making a release
+
+For maintainers. `make release` builds a universal app, signs it with a Developer ID Application certificate, notarizes it, staples the ticket and writes the zip to `dist/`. It expects the certificate in the keychain and notarization credentials saved once under the profile name `arcade-stick-mode`:
+
+```bash
+xcrun notarytool store-credentials arcade-stick-mode
+```
 
 ## License
 
